@@ -1,0 +1,86 @@
+---
+- name: Create a keycloak client for Portal
+  hosts: localhost
+  vars_files:
+    - ./keycloak-vars.yaml
+  tasks:
+    - name: Get admin token
+      uri:
+        url: "{{ keycloak_url }}/realms/master/protocol/openid-connect/token"
+        method: POST
+        body:
+          client_id: admin-cli
+          username: admin
+          password: admin
+          grant_type: password
+        body_format: form-urlencoded
+      register: token
+
+    # - name: show token
+    #   debug:
+    #     var: token.json.access_token
+
+    - name: Register Portal with Keycloak
+      keycloak_client:
+        token: "{{ token.json.access_token }}"
+        auth_keycloak_url: "{{ keycloak_url }}"
+        auth_client_id: admin-cli
+        client_authenticator_type: client-secret
+        client_id: "{{ keycloak_client_id }}"
+        authorization_services_enabled: True
+        service_accounts_enabled: True
+        standard_flow_enabled: True
+        redirect_uris:
+          - "{{ portal_redirect_uri }}"
+        protocol: openid-connect
+        protocol_mappers:
+          - config:
+              access.token.claim: True
+              claim.name: "group"
+              id.token.claim: True
+              jsonType:.label: String
+              user.attribute: "group"
+              userinfo.token.claim: True
+            name: group
+            protocol: openid-connect
+            protocolMapper: oidc-usermodel-attribute-mapper
+            consentRequired: false
+        state: present
+        enabled: True
+        validate_certs: true 
+      register: portal_client
+      delegate_to: localhost
+
+    - name: show portal client
+      debug:
+        var: portal_client.end_state.id
+
+    - name: Renew Token
+      uri:
+        url: "{{ keycloak_url }}/realms/master/protocol/openid-connect/token"
+        method: POST
+        body:
+          client_id: admin-cli
+          username: admin
+          password: admin
+          grant_type: password
+        body_format: form-urlencoded
+      register: new_token
+
+    - name: Create keycloak client secret
+      uri:
+        url: "{{ keycloak_url }}/admin/realms/master/clients/{{ portal_client.end_state.id }}/client_secret"
+        method: POST
+        follow_redirects: yes
+        # return_content: True
+        validate_certs: no
+        force_basic_auth: False
+        headers:
+          Authorization: "Basic {{ new_token.json.access_token }}"
+          Content-Type: application/json
+      register: client_secret
+
+    - name: show client secret
+      debug:
+        var: client_secret
+    
