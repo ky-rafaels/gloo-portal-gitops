@@ -17,7 +17,7 @@ spec:
           namespace: petstore
       - apiDoc:
           name: petstore-openapi-v1-users
-          namespace: default
+          namespace: petstore
     gatewayConfig:
       route:
         inlineRoute:
