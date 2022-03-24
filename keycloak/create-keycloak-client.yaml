@@ -14,15 +14,53 @@
           password: admin
           grant_type: password
         body_format: form-urlencoded
-      register: token
+      register: admin_token
 
-    # - name: show token
-    #   debug:
-    #     var: token.json.access_token
+    - name: create initial token to register the client
+      uri:
+        url: "{{ keycloak_url }}/admin/realms/master/clients-initial-access"
+        method: POST
+        return_content: true
+        validate_certs: no
+        body:
+          expiration: 0
+          count: 1
+        body_format: json
+        headers:
+          authorization: "Bearer {{ admin_token.json.access_token }}"
+          content-type: application/json
+      register: client_token
+
+    - name: show id
+      debug:
+        var: client_token.json
+
+    - name: show token
+      debug:
+        var: client_token.json.token
+    
+    - name: create initial token to register the client
+      uri:
+        url: "{{ keycloak_url }}/realms/master/clients-registrations/default"
+        method: POST
+        return_content: true
+        validate_certs: no
+        body:
+          clientId: "{{ keycloak_client_id }}"
+        body_format: json
+        headers:
+          authorization: "Bearer {{ admin_token.json.access_token }}"
+          content-type: application/json
+        status_code: [201, 200]
+      register: client_secret
+
+    - name: show client secret
+      debug:  
+        var: client_secret.json
 
     - name: Register Portal with Keycloak
       keycloak_client:
-        token: "{{ token.json.access_token }}"
+        token: "{{ admin_token.json.access_token }}"
         auth_keycloak_url: "{{ keycloak_url }}"
         auth_client_id: admin-cli
         client_authenticator_type: client-secret
@@ -30,15 +68,14 @@
         authorization_services_enabled: True
         service_accounts_enabled: True
         standard_flow_enabled: True
-        redirect_uris:
-          - "{{ portal_redirect_uri }}"
+        redirect_uris: "{{ portal_redirect_uris }}"
         protocol: openid-connect
         protocol_mappers:
           - config:
               access.token.claim: True
               claim.name: "group"
               id.token.claim: True
-              jsonType:.label: String
+              jsonType.label: String
               user.attribute: "group"
               userinfo.token.claim: True
             name: group
@@ -53,34 +90,6 @@
 
     - name: show portal client
       debug:
-        var: portal_client.end_state.id
+        var: portal_client.end_state
 
-    - name: Renew Token
-      uri:
-        url: "{{ keycloak_url }}/realms/master/protocol/openid-connect/token"
-        method: POST
-        body:
-          client_id: admin-cli
-          username: admin
-          password: admin
-          grant_type: password
-        body_format: form-urlencoded
-      register: new_token
-
-    - name: Create keycloak client secret
-      uri:
-        url: "{{ keycloak_url }}/admin/realms/master/clients/{{ portal_client.end_state.id }}/client_secret"
-        method: POST
-        follow_redirects: yes
-        # return_content: True
-        validate_certs: no
-        force_basic_auth: False
-        headers:
-          Authorization: "Basic {{ new_token.json.access_token }}"
-          Content-Type: application/json
-      register: client_secret
-
-    - name: show client secret
-      debug:
-        var: client_secret
     
