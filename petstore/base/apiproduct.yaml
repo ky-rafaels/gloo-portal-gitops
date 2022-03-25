@@ -23,7 +23,7 @@ spec:
         inlineRoute:
           backends:
             - upstream:
-                name: default-petstore-v1-8080
+                name: petstore-petstore-v1-8080
                 namespace: gloo-system
   - name: v2 # ------------ VERSION 2 -------------
     apis:
@@ -35,5 +35,5 @@ spec:
         inlineRoute:
           backends:
             - upstream:
-                name: default-petstore-v2-8080
+                name: petstore-petstore-v2-8080
                 namespace: gloo-system

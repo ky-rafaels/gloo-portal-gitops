@@ -3,13 +3,22 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 bases:
-  - ../../base/
+  - ../../base
 
-patches:
-  - path: ../patches/portal-keycloak.yaml 
-    target:
-      group: portal.gloo.solo.io 
-      version: v1beta1
-      kind: Portal
-      name: ecommerce-portal
-      namespace: petstore
+patchesStrategicMerge:
+- |-
+  apiVersion: portal.gloo.solo.io/v1beta1
+  kind: Portal
+  metadata:
+    name: ecommerce-portal
+    namespace: petstore
+  spec:
+    oidcAuth:
+      clientId: test-client
+      clientSecret:
+        name: petstore-portal-oidc-secret
+        namespace: petstore
+        key: client_secret # this is the k8s secret we have created above
+      groupClaimKey: group # we will use the 'group' claim in the 'id_token' to associate the user with a group
+      issuer: "http://18.221.19.252:8080/auth/realms/master"
+    portalUrlPrefix: http://portal.mycompany.corp/

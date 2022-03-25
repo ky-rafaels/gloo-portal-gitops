@@ -5,5 +5,5 @@ kind: Kustomization
 resources:
   - apiproduct.yaml
   - env.yaml
-  - portal-keycloak.yaml
+  - portal.yaml
   - apidoc.yaml
