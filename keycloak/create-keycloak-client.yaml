@@ -31,7 +31,7 @@
           content-type: application/json
       register: client_token
     
-    - name: create initial token to register the client
+    - name: Register client  
       uri:
         url: "{{ keycloak_url }}/realms/master/clients-registrations/default"
         method: POST
@@ -45,6 +45,10 @@
           content-type: application/json
         status_code: [201, 200]
       register: client_secret
+
+    - name: debug secret
+      debug:
+        var: client_secret.json
 
     - name: Register Portal with Keycloak
       keycloak_client:
@@ -76,4 +80,15 @@
       register: portal_client
       delegate_to: localhost
 
-    
+    - name: Apply secret to current k8s cluster context
+      kubernetes.core.k8s:
+        state: present
+        definition: 
+          apiVersion: v1
+          kind: Secret
+          type: Opaque             
+          metadata:
+            name: "{{ portal_namespace }}-portal-oidc-secret"
+            namespace: "{{ portal_namespace }}" 
+          data:
+            client_secret: "{{ client_secret.json.secret | b64encode }}"
