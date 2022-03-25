@@ -3,13 +3,41 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 bases:
-  - ../../base/
+  - ../../base
 
+# Add the usagePlans trusted parameter
 patches:
-  - path: ../patches/jwt-rbac.yaml
+  - patch: |-
+      - op: add
+        path: /spec/apiProducts/0/usagePlans 
+        value: 
+          - trusted
     target:
-      group: portal.gloo.solo.io 
+      group: portal.gloo.solo.io
       version: v1beta1
       kind: Environment
-      name: dev
-      namespace: petstore
+
+patchesStrategicMerge:
+- |-
+  apiVersion: portal.gloo.solo.io/v1beta1
+  kind: Environment
+  metadata:
+    name: dev
+    namespace: petstore
+  spec:
+    parameters:
+      usagePlans:
+        trusted:
+          displayName: trusted plan
+          rateLimit:
+            unit: MINUTE
+            requestsPerUnit: 10
+          authPolicy:
+            oauth:
+              authorizationUrl: http://18.221.19.252:8080/auth/realms/master/protocol/openid-connect/auth
+              tokenUrl: http://18.221.19.252:8080/auth/realms/master/protocol/openid-connect/token
+              jwtValidation:
+                issuer: http://18.221.19.252:8080/auth/realms/master
+                remoteJwks:
+                  refreshInterval: 60s
+                  url: http://18.221.19.252:8080/auth/realms/master/protocol/openid-connect/certs
