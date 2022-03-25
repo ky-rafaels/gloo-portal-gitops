@@ -46,10 +46,6 @@
         status_code: [201, 200]
       register: client_secret
 
-    - name: debug secret
-      debug:
-        var: client_secret.json
-
     - name: Register Portal with Keycloak
       keycloak_client:
         token: "{{ admin_token.json.access_token }}"
