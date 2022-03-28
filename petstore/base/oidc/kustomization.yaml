@@ -4,3 +4,4 @@ kind: Kustomization
 
 resources:
   - portal.yaml
+  - group.yaml

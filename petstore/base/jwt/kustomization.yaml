@@ -4,3 +4,4 @@ kind: Kustomization
 
 resources:
   - env.yaml
+  - group.yaml
