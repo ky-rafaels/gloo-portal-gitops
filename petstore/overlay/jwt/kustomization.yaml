@@ -16,6 +16,15 @@ patches:
       group: portal.gloo.solo.io
       version: v1beta1
       kind: Environment
+  - patch: |-
+      - op: add
+        path: /spec/usagePlans 
+        value: 
+          - trusted
+    target:
+      group: portal.gloo.solo.io
+      version: v1beta1
+      kind: APIProduct
 
 patchesStrategicMerge:
 - |-
