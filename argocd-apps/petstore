@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: petstore-portal-demo
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: ''
+    namespace: petstore
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: petstore/overlay
+    repoURL: 'https://github.com/ky-rafaels/gloo-portal-gitops'
+    targetRevision: master
+    directory:
+      recurse: true
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

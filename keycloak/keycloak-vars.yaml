@@ -1,0 +1,4 @@
+keycloak_url: "http://18.221.19.252:8080/auth" 
+keycloak_client_id: test-client
+portal_redirect_uris: ["https://portal.mycompany.corp/callback", "http://portal.mycompany.corp/callback"]
+portal_namespace: petstore
