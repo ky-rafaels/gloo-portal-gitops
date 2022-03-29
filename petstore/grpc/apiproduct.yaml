@@ -1,0 +1,56 @@
+apiVersion: portal.gloo.solo.io/v1beta1
+kind: APIProduct
+metadata:
+  name: petstore-product
+  namespace: petstore
+  labels:
+    app: petstore
+spec:
+  displayInfo: 
+    title: Petstore Product
+    description: Fabulous API product for the Petstore
+  usagePlans:
+    - basic2
+    - trusted
+  versions:
+  - name: v1
+    apis:
+      - apiDoc:
+          name: petstore-openapi-v1-pets
+          namespace: petstore
+      - apiDoc:
+          name: petstore-openapi-v1-users
+          namespace: petstore
+    gatewayConfig:
+      route:
+        inlineRoute:
+          backends:
+            - upstream:
+                name: default-petstore-v1-8080
+                namespace: gloo-system
+  - name: v2
+    apis:
+    - apiDoc:
+        name: petstore-openapi-v2-full
+        namespace: petstore
+    gatewayConfig:
+      route:
+        inlineRoute:
+          backends:
+            - upstream:
+                name: default-petstore-v2-8080
+                namespace: gloo-system
+  # ---------- Add new gRPC version to APIProduct ------------
+  - name: v3
+    apis:
+    - apiDoc:
+        name: petstore-grpc-doc
+        namespace: petstore
+    gatewayConfig:
+      route:
+        inlineRoute:
+          backends:
+          - kube:
+              name: petstore-grpc
+              namespace: petstore 
+              port: 8080

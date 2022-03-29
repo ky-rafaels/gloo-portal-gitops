@@ -1,0 +1,51 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+  - ../../base/03-api-rbac
+
+# Add the usagePlans basic2 parameter
+patches:
+  - patch: |-
+      - op: add
+        path: /spec/apiProducts/0/usagePlans/0
+        value: basic2
+    target:
+      group: portal.gloo.solo.io
+      version: v1beta1
+      kind: Environment
+  - patch: |-
+      - op: add
+        path: /spec/usagePlans/0
+        value: basic2
+    target:
+      group: portal.gloo.solo.io
+      version: v1beta1
+      kind: APIProduct
+  - patch: |-
+      - op: add
+        path: /spec/accessLevel/apis/0/usagePlans/0 
+        value: basic2
+    target:
+      group: portal.gloo.solo.io
+      version: v1beta1
+      kind: Group
+
+patchesStrategicMerge:
+- |-
+  apiVersion: portal.gloo.solo.io/v1beta1
+  kind: Environment
+  metadata:
+    name: dev
+    namespace: petstore
+  spec:
+    parameters:
+      usagePlans:
+        basic2:
+          authPolicy:
+            apiKey: {}
+          displayName: api-keys based plan
+          rateLimit:
+            requestsPerUnit: 5
+            unit: MINUTE

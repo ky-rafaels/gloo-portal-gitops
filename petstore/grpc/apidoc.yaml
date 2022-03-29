@@ -1,0 +1,13 @@
+apiVersion: portal.gloo.solo.io/v1beta1
+kind: APIDoc
+metadata:
+  name: petstore-grpc-doc
+  namespace: petstore
+spec:
+  grpc:
+    reflectionSource:
+      connectionTimeout: 5s
+      insecure: true
+      serviceAddress: petstore-grpc.petstore:8080
+      # we use a reflection server here to tell the Gloo Portal
+      # to fetch the schema contents directly from the petstore service.
