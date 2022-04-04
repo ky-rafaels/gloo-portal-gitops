@@ -6,7 +6,7 @@
   tasks:
     - name: Get admin token
       uri:
-        url: "{{ keycloak_url }}/realms/master/protocol/openid-connect/token"
+        url: "{{ keycloak_url }}/realms/{{ realm }}/protocol/openid-connect/token"
         method: POST
         body:
           client_id: admin-cli
@@ -18,7 +18,7 @@
 
     - name: create initial token to register the client
       uri:
-        url: "{{ keycloak_url }}/admin/realms/master/clients-initial-access"
+        url: "{{ keycloak_url }}/admin/realms/{{ realm }}/clients-initial-access"
         method: POST
         return_content: true
         validate_certs: no
@@ -33,7 +33,7 @@
     
     - name: Register client  
       uri:
-        url: "{{ keycloak_url }}/realms/master/clients-registrations/default"
+        url: "{{ keycloak_url }}/realms/{{ realm }}/clients-registrations/default"
         method: POST
         return_content: true
         validate_certs: no

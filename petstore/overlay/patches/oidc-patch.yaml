@@ -1,12 +1,3 @@
----
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-
-bases:
-  - ../../base/01-oidc
-
-patchesStrategicMerge:
-- |-
   apiVersion: portal.gloo.solo.io/v1beta1
   kind: Portal
   metadata:
@@ -22,3 +13,4 @@ patchesStrategicMerge:
       groupClaimKey: group # we will use the 'group' claim in the 'id_token' to associate the user with a group
       issuer: "http://keycloak.example.com/auth/realms/master"
     portalUrlPrefix: http://portal.example.com/
+

@@ -2,12 +2,12 @@ apiVersion: portal.gloo.solo.io/v1beta1
 kind: Group
 metadata:
   name: users
-  namespace: petstore 
+  namespace: default 
 spec:
-  displayName: corporate users
+  displayName: internal users
   accessLevel:
     portals:
     - name: ecommerce-portal
-      namespace: petstore
+      namespace: default
   groupNames: 
     - users # this represents the group name in the IdP (Keycloak)

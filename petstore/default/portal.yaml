@@ -2,7 +2,7 @@ apiVersion: portal.gloo.solo.io/v1beta1
 kind: Portal
 metadata:
   name: ecommerce-portal
-  namespace: petstore
+  namespace: default
 spec:
   displayName: E-commerce Portal
   description: The Gloo Portal for the Petstore API and much more!
@@ -15,8 +15,16 @@ spec:
   customStyling: {}
   staticPages: []
 
+  tls:
+    secretRef:
+      name: upstream-tls
+      namespace: gloo-system
+  gatewayConfig:
+    labels:
+      gateway-type: external
+
   domains:
-  - portal.mycompany.corp # ------ THE DOMAIN NAME ---------
+  - portal.example.com # ------ THE DOMAIN NAME ---------
 
   publishedEnvironments: # ---- APIs we will publish -----
   - name: dev

@@ -11,15 +11,13 @@ spec:
     namespace: petstore
     server: 'https://kubernetes.default.svc'
   source:
-    path: petstore/overlay
+    path: petstore/default
     repoURL: 'https://github.com/ky-rafaels/gloo-portal-gitops'
-    targetRevision: master
-    directory:
-      recurse: true
+    targetRevision: main
   project: default
   syncPolicy:
     automated:
       prune: true
-      selfHeal: true
+      selfHeal: false
     syncOptions:
       - CreateNamespace=true
